@@ -4,8 +4,7 @@ import tkinter as tk
 # IMPORTANT VARIABLES
 region = "na"
 username = input("Input Username")
-tagline = input("Input Tagline")
-
+tagline = input("Input Tagline ")
 
 # frame = tk.Tk()
 # frame.title("Valorant Player Info")
