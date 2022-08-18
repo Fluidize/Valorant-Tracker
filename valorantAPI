@@ -1,0 +1,19 @@
+import requests
+import tkinter as tk
+
+# IMPORTANT VARIABLES
+region = "na"
+username = input("Input Username")
+tagline = input("Input Tagline")
+
+
+# frame = tk.Tk()
+# frame.title("Valorant Player Info")
+# frame.geometry('500x400')
+# frame.resizable(0, 0)
+# region = ""
+# username = ""
+# tagline = ""
+
+
+# frame.mainloop()
