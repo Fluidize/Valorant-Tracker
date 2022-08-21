@@ -1,18 +1,24 @@
 import requests
 import tkinter as tk
+import urllib.parse as encode
+
+global status
+global errormsg
+global region
+global puuid
 
 # IMPORTANT VARIABLES
-region = "na"
-username = input("Input Username")
-tagline = input("Input Tagline ")
+a = input("a")
+if a == "a":
+    username = "fluidizeツ"
+    tagline = "bonk"
+    info = requests.get(
+        "https://api.henrikdev.xyz/valorant/v1/account/{}/{}".format(
+            encode.quote(username), encode.quote(tagline)))
+    print(info.json())
 
-# frame = tk.Tk()
-# frame.title("Valorant Player Info")
-# frame.geometry('500x400')
-# frame.resizable(0, 0)
-# region = ""
-# username = ""
-# tagline = ""
+# get basic user data
 
 
-# frame.mainloop()
+def getInfo():
+    global info
