@@ -83,8 +83,14 @@ class User:
         return data[arraynum]
 
 
-User("Turtquoise#turt")
+def getValue():
+    global inp
+    yes = dpg.get_value(inp)
+    print(yes)
 
+
+User("Turtquoise#turt")
+getValue()
 # UI
 dpg.create_context()
 dpg.create_viewport(title='Valorant Player Info', width=600, height=500)
@@ -93,9 +99,9 @@ dpg.create_viewport(title='Valorant Player Info', width=600, height=500)
 with dpg.window(tag="Valorant Player Information"):
     with dpg.menu_bar():
         with dpg.menu(label="Region"):
-            dpg.add_menu_item()
+            dpg.add_menu_item(label="Set region to NA")
         "Type in your information here.\n\n Information should be in username#tagline format."
-    dpg.add_input_text(
+    inp = dpg.add_input_text(
         label="Username", default_value="Username", tag="textbox1")
     dpg.add_input_text(
         label="Tagline", default_value="Tagline", tag="textbox2")
