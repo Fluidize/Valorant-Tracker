@@ -1,5 +1,10 @@
+import os
+try:
+    os.system("pip install requests")
+    os.system("pip install dearpygui")
+except:
+    print("Exception Ocurred")
 import requests
-import tkinter as tk
 import urllib.parse as encode
 import dearpygui.dearpygui as dpg
 
@@ -83,29 +88,22 @@ class User:
         return data[arraynum]
 
 
-def getValue():
-    global inp
-    yes = dpg.get_value(inp)
-    print(yes)
-
-
-User("Turtquoise#turt")
-getValue()
 # UI
 dpg.create_context()
 dpg.create_viewport(title='Valorant Player Info', width=600, height=500)
 
-
 with dpg.window(tag="Valorant Player Information"):
-    with dpg.menu_bar():
-        with dpg.menu(label="Region"):
-            dpg.add_menu_item(label="Set region to NA")
-        "Type in your information here.\n\n Information should be in username#tagline format."
-    inp = dpg.add_input_text(
-        label="Username", default_value="Username", tag="textbox1")
-    dpg.add_input_text(
-        label="Tagline", default_value="Tagline", tag="textbox2")
 
+    def getValue():
+        global inp
+        txt = dpg.get_value(inp)
+        print(txt)
+        return txt
+    dpg.add_text(
+        "Type in your information here.\n\n Information should be in username#tagline format.")
+    inp = dpg.add_input_text(
+        label="<-- Username and Tagline", default_value="", tag="textbox1")
+    dpg.add_button(label="Submit text", callback=getValue)
 
 dpg.set_viewport_small_icon("icon.ico")
 dpg.set_viewport_large_icon("icon.ico")
