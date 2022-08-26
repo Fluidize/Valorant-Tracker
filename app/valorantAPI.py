@@ -1,11 +1,10 @@
 from gettext import dpgettext
 import os
 from colorama import *
-import tqdm
 # try:
 #     print(Fore.CYAN + "Installing Requests")
 #     os.system("pip install requests")
-#     print(Fore.BLUE + "Installing DearPyGui")
+#     print("Installing DearPyGui")
 #     os.system("pip install dearpygui")
 #     print(Style.RESET_ALL)
 # except:
@@ -21,13 +20,20 @@ class User:
     def __init__(self, player):
         global basicInfo
         global mmrInfo
+        global stat
         player = player.split("#")
         self.username = player[0]
         self.tagline = player[1]
         basicInfo = requests.get(
             "https://api.henrikdev.xyz/valorant/v1/account/{}/{}".format(
                 encode.quote(self.username), encode.quote(self.tagline))).json()
+
+        # checks status
         self.status = basicInfo['status']
+        if self.status == 404:
+            dpg.set_value(stat, "Player not found; 404")
+        elif self.status == 429:
+            dpg.set_value(stat, "Too many requests, try again in 150 seconds.")
 
         self.region = basicInfo['data']['region']
         self.puuid = basicInfo['data']['puuid']
@@ -95,10 +101,9 @@ class User:
         print(str(round(latency*1000, 2))+"ms")
 
 
-User("Turtquoise#turt").getLatency()
 # UI
 dpg.create_context()
-dpg.create_viewport(title='Valorant Player Info', width=600, height=500)
+dpg.create_viewport(title='Valorant Player Info', width=600, height=600)
 
 with dpg.window(tag="Valorant Player Information"):
     writeFile = 0
@@ -108,13 +113,16 @@ with dpg.window(tag="Valorant Player Information"):
         global save
         if writeFile == 0:
             writeFile = 1
-            dpg.set_value(save, "Save to file (Enabled)")
+            dpg.set_value(save_stat, "Save to File (Enabled)")
             print("Enabled")
 
         elif writeFile == 1:
             writeFile = 0
-            dpg.set_value(save, "Save to file(Disabled)")
-            os.remove("data.txt")
+            dpg.set_value(save_stat, "Save to File (Disabled)")
+            try:
+                os.remove("data.txt")
+            except:
+                print("File doesn't exist.")
             print("Disabled")
 
     def callback():
@@ -140,17 +148,21 @@ with dpg.window(tag="Valorant Player Information"):
 
         return txt
 
-    dpg.add_text(
-        "Type in your information here.")
     dpg.add_text("Information should be in username#tagline format.")
     stat = dpg.add_text("No username submitted yet.")
     inp = dpg.add_input_text(
         label="<-- Username and Tagline", default_value="", tag="textbox1")
-    save = dpg.add_button(label="Save to file", callback=toggleFile)
     dpg.add_button(label="Submit text", callback=callback)
+
+with dpg.window(label="Window2", pos=(300, 360), width=175):
+    save = dpg.add_button(
+        label="Toggle Save to File", callback=toggleFile)
+    save_stat = dpg.add_text("")
+
 
 dpg.set_viewport_small_icon("icon.ico")
 dpg.set_viewport_large_icon("icon.ico")
+dpg.set_viewport_resizable(False)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.set_primary_window("Valorant Player Information", True)
