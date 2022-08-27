@@ -14,6 +14,12 @@ import urllib.parse as encode
 import dearpygui.dearpygui as dpg
 #global variables
 global valUser
+print(Fore.GREEN)
+print(os.listdir(os.getcwd()))
+try:
+    print(Fore.LIGHTGREEN_EX + "Current Directory: " + os.getcwd())
+except:
+    print(Fore.LIGHTYELLOW_EX + "Couldn't change current working directory.")
 
 
 class User:
