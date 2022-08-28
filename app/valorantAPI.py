@@ -1,7 +1,6 @@
-from gettext import dpgettext
 import os
 from colorama import *
-# try:
+# try:t
 #     print(Fore.CYAN + "Installing Requests")
 #     os.system("pip install requests")
 #     print("Installing DearPyGui")
@@ -10,42 +9,42 @@ from colorama import *
 # except:
 #     print(Fore.RED + "Exception occured whilst installing modules")
 import requests
-import urllib.parse as encode
 import dearpygui.dearpygui as dpg
-#global variables
+# global variables
 global valUser
-print(Fore.GREEN)
-print(os.listdir(os.getcwd()))
-try:
-    print(Fore.LIGHTGREEN_EX + "Current Directory: " + os.getcwd())
-except:
-    print(Fore.LIGHTYELLOW_EX + "Couldn't change current working directory.")
+
+
+FOLDERDIR = os.path.dirname(os.path.dirname(__file__))
+os.chdir(FOLDERDIR)
+subdir = os.listdir(os.getcwd())
+dirdict = {}
+# gets all subfolders in cwd
+for x in range(len(subdir)):
+    dirdict.update({f"{subdir[x]}": subdir[x]})
 
 
 class User:
     def __init__(self, player):
         global basicInfo
         global mmrInfo
+        global matchInfo
         global stat
+        print(player)
         player = player.split("#")
         self.username = player[0]
         self.tagline = player[1]
         basicInfo = requests.get(
             "https://api.henrikdev.xyz/valorant/v1/account/{}/{}".format(
-                encode.quote(self.username), encode.quote(self.tagline))).json()
-
-        # checks status
+                self.username, self.tagline)).json()
         self.status = basicInfo['status']
-        if self.status == 404:
-            dpg.set_value(stat, "Player not found; 404")
-        elif self.status == 429:
-            dpg.set_value(stat, "Too many requests, try again in 150 seconds.")
-
+        print(self.status)
         self.region = basicInfo['data']['region']
         self.puuid = basicInfo['data']['puuid']
         mmrInfo = requests.get(
             "https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr/{}/{}".format(self.region, self.puuid)).json()
         self.level = basicInfo['data']['account_level']
+        # matchInfo = requests.get(
+        #     "https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/{}/{}".format(self.region, self.puuid)).json()
 
     def changeobj(self, classObj, new_value):
         classObj = classObj.lower().strip()
@@ -59,22 +58,36 @@ class User:
             self.puuid = new_value
 
     # default returns small
-    def getCard(self, type="small"):
+    def getCard(self, type="small", save=False):
         cardType = str(type.lower())
         card = basicInfo['data']['card'][cardType]
-        return card
-
+        img_data = requests.get(card)
+        print(img_data)
+        if save:
+            img_data = img_data.content
+            os.chdir("img_temp")
+            with open(f"{type}card.png", "wb") as f:
+                f.write(img_data)
+        else:
+            return card
+        os.chdir(FOLDERDIR)
     # default returns rank
+
     def getMMRData(self, arraynum=0):
         # allll the data
         data = []
-
         # comp rank; 0
         rank = mmrInfo['data']['currenttierpatched']
         data.append(rank)
 
         # current amount of rr in game; 1
-        currentrr = str(mmrInfo['data']['elo'])[1:]
+        currentrr = str(mmrInfo['data']['elo'])
+        if len(currentrr) <= 2:
+            currentrr = currentrr
+        elif len(currentrr) == 3:
+            currentrr = currentrr[1:]
+        elif len(currentrr) == 4:
+            currentrr = currentrr[2:]
         data.append(currentrr)
 
         # rr gained from last game; 2
@@ -101,6 +114,9 @@ class User:
 
         return data[arraynum]
 
+    def getMatchHistory(self):
+        pass
+
     def getLatency(self):
         latency = requests.get(
             "https://api.henrikdev.xyz/valorant/v1/account/Henrik3/EUW3").elapsed.total_seconds()
@@ -112,11 +128,19 @@ dpg.create_context()
 dpg.create_viewport(title='Valorant Player Info', width=600, height=600)
 
 with dpg.window(tag="Valorant Player Information"):
-    writeFile = 0
+    writeFile = 1
+
+    def clearFolder():
+        for root, dirs, files in os.walk(dirdict["player_data"], topdown=True):
+            for x in range(len(dirs)):
+                print(dirs[x])
+                os.remove(dirdict["player_data"] + "//" + dirs[x])
+            for y in range(len(files)):
+                print(files[y])
+                os.remove(dirdict["player_data"] + "//" + files[y])
 
     def toggleFile():
         global writeFile
-        global save
         if writeFile == 0:
             writeFile = 1
             dpg.set_value(save_stat, "Save to File (Enabled)")
@@ -125,10 +149,6 @@ with dpg.window(tag="Valorant Player Information"):
         elif writeFile == 1:
             writeFile = 0
             dpg.set_value(save_stat, "Save to File (Disabled)")
-            try:
-                os.remove("data.txt")
-            except:
-                print("File doesn't exist.")
             print("Disabled")
 
     def callback():
@@ -139,16 +159,20 @@ with dpg.window(tag="Valorant Player Information"):
         if txt == "":
             print("No text was read")
         else:
-            # user input turned into instance
+            # user input turned into instance TURN INTO URL
             valUser = User(txt)
-
+            valUser.getCard("small", save=True)
         if bool(writeFile):
-            with open("data.txt", "w") as f:
+            os.chdir(dirdict['player_data'])
+            with open(f"{valUser.username}.txt", "w") as f:
                 f.write(valUser.puuid + "\n")
                 f.write(valUser.username + "\n")
                 f.write(valUser.tagline + "\n")
+                f.write(valUser.region + "\n")
+                f.write(str(valUser.level) + "\n")
+            os.chdir(FOLDERDIR)
         else:
-            print(f"writeFile:{writeFile}")
+            print(f"writeFile: {writeFile}")
         dpg.set_value(stat, "Username and tagline successfully input.")
         print(Fore.GREEN + "Valorant User instance successfully created")
 
@@ -160,10 +184,11 @@ with dpg.window(tag="Valorant Player Information"):
         label="<-- Username and Tagline", default_value="", tag="textbox1")
     dpg.add_button(label="Submit text", callback=callback)
 
-with dpg.window(label="Window2", pos=(300, 360), width=175):
-    save = dpg.add_button(
+with dpg.window(label="Window2", pos=(300, 360), width=200):
+    dpg.add_button(
         label="Toggle Save to File", callback=toggleFile)
-    save_stat = dpg.add_text("")
+    dpg.add_button(label="Delete Saved Player Data", callback=clearFolder)
+    save_stat = dpg.add_text("Save to File (Enabled)")
 
 
 dpg.set_viewport_small_icon("icon.ico")
