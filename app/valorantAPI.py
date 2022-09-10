@@ -1,13 +1,13 @@
 import os
 from colorama import *
-# try:t
-#     print(Fore.CYAN + "Installing Requests")
-#     os.system("pip install requests")
-#     print("Installing DearPyGui")
-#     os.system("pip install dearpygui")
-#     print(Style.RESET_ALL)
-# except:
-#     print(Fore.RED + "Exception occured whilst installing modules")
+try:
+    print(Fore.CYAN + "Installing Requests")
+    os.system("pip install requests")
+    print("Installing DearPyGui")
+    os.system("pip install dearpygui")
+    print(Style.RESET_ALL)
+except:
+    print(Fore.RED + "Exception occured whilst installing modules")
 import requests
 import dearpygui.dearpygui as dpg
 # global variables
