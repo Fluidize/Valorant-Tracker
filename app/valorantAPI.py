@@ -12,7 +12,7 @@ import requests
 import dearpygui.dearpygui as dpg
 # global variables
 global valUser
-
+# hi
 
 FOLDERDIR = os.path.dirname(os.path.dirname(__file__))
 os.chdir(FOLDERDIR)
