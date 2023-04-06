@@ -37,7 +37,7 @@ class User:
             "https://api.henrikdev.xyz/valorant/v1/by-puuid/mmr/{}/{}".format(self.region, self.puuid)).json()
         self.level = basicInfo['data']['account_level']
         # matchInfo = requests.get(
-        #     "https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/{}/{}".format(self.region, self.puuid)).json()
+        #     "https://api.henrikdev.xyz/valorant/v3/matches/{}/{}".format(self.region, self.puuid)).json()
 
     def changeobj(self, classObj, new_value):
         classObj = classObj.lower().strip()
@@ -120,6 +120,8 @@ class User:
 class App(User):
     def __init__(self, player):
         User.__init__(self, player)
+        User.getCard()
+        User.getMMRData()
 
 
 print(App("KiTSUNEシ#002").getMMRData())
