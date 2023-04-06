@@ -1,26 +1,9 @@
 import os
-from colorama import *
-try:
-    print(Fore.CYAN + "Installing Requests")
-    os.system("pip install requests")
-    print("Installing DearPyGui")
-    os.system("pip install dearpygui")
-    print(Style.RESET_ALL)
-except:
-    print(Fore.RED + "Exception occured whilst installing modules")
 import requests
-import dearpygui.dearpygui as dpg
-# global variables
-global valUser
-# hi
 
 FOLDERDIR = os.path.dirname(os.path.dirname(__file__))
 os.chdir(FOLDERDIR)
-subdir = os.listdir(os.getcwd())
-dirdict = {}
-# gets all subfolders in cwd
-for x in range(len(subdir)):
-    dirdict.update({f"{subdir[x]}": subdir[x]})
+print(FOLDERDIR)
 
 
 class User:
@@ -58,18 +41,11 @@ class User:
             self.puuid = new_value
 
     # default returns small
-    def getCard(self, type="small", save=False):
+    def getCard(self, type="small", save=True):
         cardType = str(type.lower())
         card = basicInfo['data']['card'][cardType]
         img_data = requests.get(card)
-        print(img_data)
-        if save:
-            img_data = img_data.content
-            os.chdir("img_temp")
-            with open(f"{type}card.png", "wb") as f:
-                f.write(img_data)
-        else:
-            return card
+
         os.chdir(FOLDERDIR)
     # default returns rank
 
@@ -121,81 +97,3 @@ class User:
         latency = requests.get(
             "https://api.henrikdev.xyz/valorant/v1/account/Henrik3/EUW3").elapsed.total_seconds()
         print(str(round(latency*1000, 2))+"ms")
-
-
-# UI
-dpg.create_context()
-dpg.create_viewport(title='Valorant Player Info', width=600, height=600)
-
-with dpg.window(tag="Valorant Player Information"):
-    writeFile = 1
-
-    def clearFolder():
-        for root, dirs, files in os.walk(dirdict["player_data"], topdown=True):
-            for x in range(len(dirs)):
-                print(dirs[x])
-                os.remove(dirdict["player_data"] + "//" + dirs[x])
-            for y in range(len(files)):
-                print(files[y])
-                os.remove(dirdict["player_data"] + "//" + files[y])
-
-    def toggleFile():
-        global writeFile
-        if writeFile == 0:
-            writeFile = 1
-            dpg.set_value(save_stat, "Save to File (Enabled)")
-            print("Enabled")
-
-        elif writeFile == 1:
-            writeFile = 0
-            dpg.set_value(save_stat, "Save to File (Disabled)")
-            print("Disabled")
-
-    def callback():
-        global writeFile
-        global valUser
-        print("Called")
-        txt = dpg.get_value(inp)
-        if txt == "":
-            print("No text was read")
-        else:
-            # user input turned into instance TURN INTO URL
-            valUser = User(txt)
-            valUser.getCard("small", save=True)
-        if bool(writeFile):
-            os.chdir(dirdict['player_data'])
-            with open(f"{valUser.username}.txt", "w") as f:
-                f.write(valUser.puuid + "\n")
-                f.write(valUser.username + "\n")
-                f.write(valUser.tagline + "\n")
-                f.write(valUser.region + "\n")
-                f.write(str(valUser.level) + "\n")
-            os.chdir(FOLDERDIR)
-        else:
-            print(f"writeFile: {writeFile}")
-        dpg.set_value(stat, "Username and tagline successfully input.")
-        print(Fore.GREEN + "Valorant User instance successfully created")
-
-        return txt
-
-    dpg.add_text("Information should be in username#tagline format.")
-    stat = dpg.add_text("No username submitted yet.")
-    inp = dpg.add_input_text(
-        label="<-- Username and Tagline", default_value="", tag="textbox1")
-    dpg.add_button(label="Submit text", callback=callback)
-
-with dpg.window(label="Window2", pos=(300, 360), width=200):
-    dpg.add_button(
-        label="Toggle Save to File", callback=toggleFile)
-    dpg.add_button(label="Delete Saved Player Data", callback=clearFolder)
-    save_stat = dpg.add_text("Save to File (Enabled)")
-
-
-dpg.set_viewport_small_icon("icon.ico")
-dpg.set_viewport_large_icon("icon.ico")
-dpg.set_viewport_resizable(False)
-dpg.setup_dearpygui()
-dpg.show_viewport()
-dpg.set_primary_window("Valorant Player Information", True)
-dpg.start_dearpygui()
-dpg.destroy_context()
