@@ -120,8 +120,8 @@ class User:
 class App(User):
     def __init__(self, player):
         User.__init__(self, player)
+        self.mmrdata = User.getMMRData()
         User.getCard()
-        User.getMMRData()
 
 
-print(App("KiTSUNEシ#002").getMMRData())
+print(App("KiTSUNEシ#002"))
