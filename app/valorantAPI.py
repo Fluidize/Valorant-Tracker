@@ -97,3 +97,5 @@ class User:
         latency = requests.get(
             "https://api.henrikdev.xyz/valorant/v1/account/Henrik3/EUW3").elapsed.total_seconds()
         print(str(round(latency*1000, 2))+"ms")
+
+User("Fluidize#flow")
