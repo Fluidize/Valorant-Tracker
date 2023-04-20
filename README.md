@@ -1,4 +1,4 @@
-# Valorant-API
+# Valorant Tracker
 
 Valorant tracker written in python using flask.
 
